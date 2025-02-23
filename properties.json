@@ -1,0 +1,44 @@
+[
+  {
+    "squareFootage": 1200,
+    "lighting": "high",
+    "price": 250000,
+    "rooms": 3,
+    "bathrooms": 2,
+    "location": [40, -110],
+    "description": "Beautiful apartment.",
+    "amenities": {
+      "yard": false,
+      "garage": true,
+      "pool": false
+    }
+  },
+  {
+    "squareFootage": 2000,
+    "lighting": "medium",
+    "price": 400000,
+    "rooms": 4,
+    "bathrooms": 3,
+    "location": [34, -118],
+    "description": "Family home.",
+    "amenities": {
+      "yard": true,
+      "garage": true,
+      "pool": false
+    }
+  },
+  {
+    "squareFootage": 1800,
+    "lighting": "low",
+    "price": 320000,
+    "rooms": 3,
+    "bathrooms": 2,
+    "location": [41, -87],
+    "description": "Cozy house.",
+    "amenities": {
+      "yard": true,
+      "garage": false,
+      "pool": true
+    }
+  }
+]
