@@ -10,7 +10,7 @@ import (
 
 func Test_Args_Filters_Provider_Get_Filters(t *testing.T) {
 	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
-	os.Args = []string{"cmd", "-minSqFt", "1100", "-maxSqFt", "1200"}
+	os.Args = []string{"cmd", "-minSqFt", "1100", "-maxSqFt", "1200", "-amenities", "garage:true"}
 
 	filterProvider := NewArgsFilterProvider()
 
@@ -21,9 +21,74 @@ func Test_Args_Filters_Provider_Get_Filters(t *testing.T) {
 
 	var expectedFilters []entities.Filter
 	expectedFilters = append(expectedFilters,
-		&entities.SquareFootageFilter{SquareFootageRange: &entities.SquareFootageRange{Min: toPtr(1100), Max: toPtr(1200)}})
+		&entities.SquareFootageFilter{SquareFootageRange: &entities.SquareFootageRange{Min: toPtr(1100), Max: toPtr(1200)}},
+		&entities.InclusionFilter{Field: "garage", Value: true})
 
 	assert.Equal(t, len(expectedFilters), len(filters.Filters))
+}
+
+func TestParseSquareFootage_InvalidMin(t *testing.T) {
+	flags := map[string]string{
+		"minSqFt": "abc",
+		"maxSqFt": "1234",
+	}
+
+	filters := parseSquareFootage(flags)
+
+	if len(filters) != 1 {
+		t.Errorf("Expected 1 filter, got %d", len(filters))
+	}
+
+	sqFtFilter, ok := filters[0].(*entities.SquareFootageFilter)
+	if !ok {
+		t.Fatalf("Expected SquareFootageFilter, got %T", filters[0])
+	}
+
+	if sqFtFilter.SquareFootageRange.Min != nil {
+		t.Errorf("Expected Min to be nil, got %d", *sqFtFilter.SquareFootageRange.Min)
+	}
+}
+
+func TestParseSquareFootage_InvalidMax(t *testing.T) {
+	flags := map[string]string{
+		"minSqFt": "123",
+		"maxSqFt": "cde",
+	}
+
+	filters := parseSquareFootage(flags)
+
+	if len(filters) != 1 {
+		t.Errorf("Expected 1 filter, got %d", len(filters))
+	}
+
+	sqFtFilter, ok := filters[0].(*entities.SquareFootageFilter)
+	if !ok {
+		t.Fatalf("Expected SquareFootageFilter, got %T", filters[0])
+	}
+
+	if sqFtFilter.SquareFootageRange.Max != nil {
+		t.Errorf("Expected Max to be nil, got %d", *sqFtFilter.SquareFootageRange.Max)
+	}
+}
+
+func TestParseAmenities_EmptyString(t *testing.T) {
+	filters := parseAmenities("")
+
+	if len(filters) != 0 {
+		t.Errorf("Expected empty filter list, got %d filters", len(filters))
+	}
+}
+
+func TestParseAmenities_InvalidFormat(t *testing.T) {
+	filters := parseAmenities("garage:true,pool")
+
+	if len(filters) != 1 {
+		t.Errorf("Expected 1 filter, got %d", len(filters))
+	}
+
+	if f, ok := filters[0].(*entities.InclusionFilter); !ok || f.Field != "garage" || f.Value != true {
+		t.Errorf("Expected InclusionFilter for garage:true, got %+v", f)
+	}
 }
 
 func toPtr(number int) *int {

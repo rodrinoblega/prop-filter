@@ -63,6 +63,10 @@ func mockedFilters() *entities.Filters {
 					Max: &maxSqFt,
 				},
 			},
+			&entities.InclusionFilter{
+				Field: "garage",
+				Value: true,
+			},
 		},
 	}
 
@@ -73,9 +77,15 @@ func mockedProperties() []entities.Property {
 	properties := []entities.Property{
 		{
 			SquareFootage: 120,
+			Amenities: map[string]bool{
+				"garage": true,
+			},
 		},
 		{
 			SquareFootage: 200,
+			Amenities: map[string]bool{
+				"garage": true,
+			},
 		},
 		{
 			SquareFootage: 80,

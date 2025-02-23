@@ -10,3 +10,23 @@ type Property struct {
 	Description   string          `json:"description"`
 	Amenities     map[string]bool `json:"amenities"`
 }
+
+type SquareFootageRange struct {
+	Min *int
+	Max *int
+}
+
+func (sfr *SquareFootageRange) Contains(value int) bool {
+	if sfr.Min != nil && value < *sfr.Min {
+		return false
+	}
+	if sfr.Max != nil && value > *sfr.Max {
+		return false
+	}
+
+	return true
+}
+
+func (p *Property) HasAmenity(amenity string) bool {
+	return p.Amenities[amenity]
+}
