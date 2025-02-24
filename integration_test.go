@@ -67,6 +67,14 @@ func mockedFilters() *entities.Filters {
 				Field: "garage",
 				Value: true,
 			},
+			&entities.MatchingFilter{
+				Word: "Family",
+			},
+			&entities.DistanceFilter{
+				Lat:     34,
+				Lon:     -118,
+				MaxDist: 100,
+			},
 		},
 	}
 
@@ -80,15 +88,21 @@ func mockedProperties() []entities.Property {
 			Amenities: map[string]bool{
 				"garage": true,
 			},
+			Description: "Beautiful apartment.",
+			Location:    [2]float64{40, -110},
 		},
 		{
 			SquareFootage: 200,
 			Amenities: map[string]bool{
 				"garage": true,
 			},
+			Description: "Family home.",
+			Location:    [2]float64{34, -118},
 		},
 		{
 			SquareFootage: 80,
+			Description:   "Cozy house.",
+			Location:      [2]float64{41, -87},
 		},
 	}
 

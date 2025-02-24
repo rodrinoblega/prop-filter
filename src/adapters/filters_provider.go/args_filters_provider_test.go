@@ -10,7 +10,7 @@ import (
 
 func Test_Args_Filters_Provider_Get_Filters(t *testing.T) {
 	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
-	os.Args = []string{"cmd", "-minSqFt", "1100", "-maxSqFt", "1200", "-amenities", "garage:true"}
+	os.Args = []string{"cmd", "-minSqFt", "1100", "-maxSqFt", "1200", "-amenities", "garage:true", "-contains", "Family", "-lat", "34", "-lon", "-118", "-maxDist", "100"}
 
 	filterProvider := NewArgsFilterProvider()
 
@@ -22,7 +22,9 @@ func Test_Args_Filters_Provider_Get_Filters(t *testing.T) {
 	var expectedFilters []entities.Filter
 	expectedFilters = append(expectedFilters,
 		&entities.SquareFootageFilter{SquareFootageRange: &entities.SquareFootageRange{Min: toPtr(1100), Max: toPtr(1200)}},
-		&entities.InclusionFilter{Field: "garage", Value: true})
+		&entities.InclusionFilter{Field: "garage", Value: true},
+		&entities.MatchingFilter{Word: "Family"},
+		&entities.DistanceFilter{Lat: 34, Lon: -118, MaxDist: 100})
 
 	assert.Equal(t, len(expectedFilters), len(filters.Filters))
 }
@@ -88,6 +90,47 @@ func TestParseAmenities_InvalidFormat(t *testing.T) {
 
 	if f, ok := filters[0].(*entities.InclusionFilter); !ok || f.Field != "garage" || f.Value != true {
 		t.Errorf("Expected InclusionFilter for garage:true, got %+v", f)
+	}
+}
+
+func TestParseDistance_MissingArgs(t *testing.T) {
+	tests := []struct {
+		name  string
+		flags map[string]string
+	}{
+		{"Missing lat", map[string]string{"lon": "34.56", "maxDist": "10"}},
+		{"Missing lon", map[string]string{"lat": "-58.45", "maxDist": "10"}},
+		{"Missing maxDist", map[string]string{"lat": "-58.45", "lon": "34.56"}},
+		{"All missing", map[string]string{}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := parseDistance(tt.flags)
+			if len(got) != 0 {
+				t.Errorf("Expected no filters, got %v", got)
+			}
+		})
+	}
+}
+
+func TestParseDistance_InvalidValues(t *testing.T) {
+	tests := []struct {
+		name  string
+		flags map[string]string
+	}{
+		{"Invalid lat", map[string]string{"lat": "abc", "lon": "34.56", "maxDist": "10"}},
+		{"Invalid lon", map[string]string{"lat": "-58.45", "lon": "xyz", "maxDist": "10"}},
+		{"Invalid maxDist", map[string]string{"lat": "-58.45", "lon": "34.56", "maxDist": "asdasd"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := parseDistance(tt.flags)
+			if len(got) != 0 {
+				t.Errorf("Expected no filters, got %v", got)
+			}
+		})
 	}
 }
 
