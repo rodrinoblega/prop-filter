@@ -9,17 +9,12 @@ import (
 )
 
 func main() {
-	propertiesChan := make(chan entities.Property, 100)
-	errorChan := make(chan error, 10)
-
 	propertyReader := readers.NewJSONPropertyReader("./properties.json")
 
 	filterProvider := filters_provider.NewArgsFilterProvider()
 
 	propertyFinder := use_cases.NewPropertyFinder(
 		use_cases.PropertyFinderInputs{
-			PropertiesChan: propertiesChan,
-			ErrorChan:      errorChan,
 			PropertyReader: propertyReader,
 			FilterProvider: filterProvider,
 		},

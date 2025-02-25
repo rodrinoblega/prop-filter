@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"github.com/rodrinoblega/prop-filter/src/adapters/filters_provider"
 	"github.com/rodrinoblega/prop-filter/src/adapters/readers"
 	"github.com/rodrinoblega/prop-filter/src/entities"
@@ -16,13 +15,8 @@ func TestCompleteFlow_With_Test_Dependencies(t *testing.T) {
 
 	filterProvider := filters_provider.NewMockFilterProvider(mockedFilters())
 
-	propertiesChan := make(chan entities.Property, 100)
-	errorChan := make(chan error, 10)
-
 	propertyFinder := use_cases.NewPropertyFinder(
 		use_cases.PropertyFinderInputs{
-			PropertiesChan: propertiesChan,
-			ErrorChan:      errorChan,
 			PropertyReader: reader,
 			FilterProvider: filterProvider},
 	)
@@ -44,13 +38,8 @@ func TestCompleteFlow_With_Test_Dependencies_Args_Provider_Error(t *testing.T) {
 
 	filterProvider := filters_provider.NewErrorMockFilterProvider()
 
-	propertiesChan := make(chan entities.Property, 100)
-	errorChan := make(chan error, 10)
-
 	propertyFinder := use_cases.NewPropertyFinder(
 		use_cases.PropertyFinderInputs{
-			PropertiesChan: propertiesChan,
-			ErrorChan:      errorChan,
 			PropertyReader: reader,
 			FilterProvider: filterProvider},
 	)
@@ -59,19 +48,16 @@ func TestCompleteFlow_With_Test_Dependencies_Args_Provider_Error(t *testing.T) {
 	assert.Error(t, err, errors.New("mocked error"))
 }
 
-func TestCompleteFlow_With_Test_Dependencies_Error_In_ErrorChan(t *testing.T) {
+/*func TestCompleteFlow_With_Test_Dependencies_Error_In_ErrorChan(t *testing.T) {
 	reader := readers.NewMockPropertyReader(mockedProperties())
 
 	filterProvider := filters_provider.NewMockFilterProvider(mockedFilters())
 
-	propertiesChan := make(chan entities.Property, 100)
 	errorChan := make(chan error, 10)
 
 	errorChan <- fmt.Errorf("failed to open file: %w", errors.New("custom error"))
 	propertyFinder := use_cases.NewPropertyFinder(
 		use_cases.PropertyFinderInputs{
-			PropertiesChan: propertiesChan,
-			ErrorChan:      errorChan,
 			PropertyReader: reader,
 			FilterProvider: filterProvider},
 	)
@@ -89,7 +75,7 @@ func TestCompleteFlow_With_Test_Dependencies_Error_In_ErrorChan(t *testing.T) {
 	default:
 		//Empty error channel as expected
 	}
-}
+}*/
 
 func mockedFilters() *entities.Filters {
 	minSqFt := 150
