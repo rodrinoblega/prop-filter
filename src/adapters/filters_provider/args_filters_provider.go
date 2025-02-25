@@ -1,4 +1,4 @@
-package filters_provider_go
+package filters_provider
 
 import (
 	"flag"
@@ -53,19 +53,19 @@ func ParseFlags() (args Args) {
 		flags["amenities"] = *amenities
 	}
 
-	if *amenities != "" {
+	if *contains != "" {
 		flags["contains"] = *contains
 	}
 
-	if *amenities != "" {
+	if *lat != "" {
 		flags["lat"] = *lat
 	}
 
-	if *amenities != "" {
+	if *lon != "" {
 		flags["lon"] = *lon
 	}
 
-	if *amenities != "" {
+	if *maxDist != "" {
 		flags["maxDist"] = *maxDist
 	}
 

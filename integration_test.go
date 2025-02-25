@@ -2,8 +2,9 @@ package main
 
 import (
 	"errors"
-	"github.com/rodrinoblega/prop-filter/src/adapters/filters_provider.go"
-	"github.com/rodrinoblega/prop-filter/src/adapters/repositories"
+	"fmt"
+	"github.com/rodrinoblega/prop-filter/src/adapters/filters_provider"
+	"github.com/rodrinoblega/prop-filter/src/adapters/readers"
 	"github.com/rodrinoblega/prop-filter/src/entities"
 	"github.com/rodrinoblega/prop-filter/src/use_cases"
 	"github.com/stretchr/testify/assert"
@@ -11,11 +12,14 @@ import (
 )
 
 func TestCompleteFlow_With_Test_Dependencies(t *testing.T) {
-	repo := repositories.NewMockPropertyRepository(mockedProperties())
+	repo := readers.NewMockPropertyReader(mockedProperties())
 
-	filterProvider := filters_provider_go.NewMockFilterProvider(mockedFilters())
+	filterProvider := filters_provider.NewMockFilterProvider(mockedFilters())
 
-	propertyFinder := use_cases.NewPropertyFinder(repo, filterProvider)
+	jobChan := make(chan entities.Property, 100)
+	errorChan := make(chan error, 10)
+
+	propertyFinder := use_cases.NewPropertyFinder(jobChan, errorChan, repo, filterProvider)
 
 	filteredProperties, err := propertyFinder.Execute()
 
@@ -29,26 +33,44 @@ func TestCompleteFlow_With_Test_Dependencies(t *testing.T) {
 	}
 }
 
-func TestCompleteFlow_With_Test_Dependencies_Filter_Provider_Error(t *testing.T) {
-	repo := repositories.NewErrorMockPropertyRepository()
+func TestCompleteFlow_With_Test_Dependencies_Args_Provider_Error(t *testing.T) {
+	repo := readers.NewMockPropertyReader(mockedProperties())
 
-	filterProvider := filters_provider_go.NewMockFilterProvider(mockedFilters())
+	filterProvider := filters_provider.NewErrorMockFilterProvider()
 
-	propertyFinder := use_cases.NewPropertyFinder(repo, filterProvider)
+	jobChan := make(chan entities.Property, 100)
+	errorChan := make(chan error, 10)
+
+	propertyFinder := use_cases.NewPropertyFinder(jobChan, errorChan, repo, filterProvider)
 
 	_, err := propertyFinder.Execute()
 	assert.Error(t, err, errors.New("mocked error"))
 }
 
-func TestCompleteFlow_With_Test_Dependencies_Args_Provider_Error(t *testing.T) {
-	repo := repositories.NewMockPropertyRepository(mockedProperties())
+func TestCompleteFlow_With_Test_Dependencies_Error_In_ErrorChan(t *testing.T) {
+	repo := readers.NewMockPropertyReader(mockedProperties())
 
-	filterProvider := filters_provider_go.NewErrorMockFilterProvider()
+	filterProvider := filters_provider.NewMockFilterProvider(mockedFilters())
 
-	propertyFinder := use_cases.NewPropertyFinder(repo, filterProvider)
+	jobChan := make(chan entities.Property, 100)
+	errorChan := make(chan error, 10)
+
+	errorChan <- fmt.Errorf("failed to open file: %w", errors.New("custom error"))
+	propertyFinder := use_cases.NewPropertyFinder(jobChan, errorChan, repo, filterProvider)
 
 	_, err := propertyFinder.Execute()
-	assert.Error(t, err, errors.New("mocked error"))
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	select {
+	case err := <-errorChan:
+		if err != nil {
+			t.Fatal("Expected a nil error because it should have been displayed within the execution")
+		}
+	default:
+		//Empty error channel as expected
+	}
 }
 
 func mockedFilters() *entities.Filters {

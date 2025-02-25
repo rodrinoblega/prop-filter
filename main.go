@@ -1,28 +1,37 @@
 package main
 
 import (
-	"fmt"
-	"github.com/rodrinoblega/prop-filter/src/adapters/filters_provider.go"
-	"github.com/rodrinoblega/prop-filter/src/adapters/repositories"
+	"github.com/rodrinoblega/prop-filter/src/adapters/filters_provider"
+	"github.com/rodrinoblega/prop-filter/src/adapters/readers"
+	"github.com/rodrinoblega/prop-filter/src/entities"
 	"github.com/rodrinoblega/prop-filter/src/use_cases"
 	"log"
 )
 
 func main() {
 
-	repo, err := repositories.NewJSONPropertyRepository("./properties.json")
-	if err != nil {
-		log.Fatalf("Error reading properties: %v", err)
-	}
+	propertiesChan := make(chan entities.Property, 100)
+	errorChan := make(chan error, 10)
 
-	filterProvider := filters_provider_go.NewArgsFilterProvider()
+	propertyReader := readers.NewJSONPropertyReader("./properties.json")
 
-	propertyFinder := use_cases.NewPropertyFinder(repo, filterProvider)
+	filterProvider := filters_provider.NewArgsFilterProvider()
+
+	propertyFinder := use_cases.NewPropertyFinder(propertiesChan, errorChan, propertyReader, filterProvider)
 
 	properties, err := propertyFinder.Execute()
 	if err != nil {
 		log.Fatalf("Error executing property finder: %v", err)
 	}
 
-	fmt.Printf("Loaded %d properties\n", len(properties))
+	log.Printf("Loaded %d properties after filtering.\n", len(properties))
+
+	printProperties(properties)
+}
+
+func printProperties(properties []entities.Property) {
+	log.Println("Filtered Properties:")
+	for i, prop := range properties {
+		log.Printf("%d. %+v\n", i+1, prop)
+	}
 }

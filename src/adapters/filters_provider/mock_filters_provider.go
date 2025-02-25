@@ -1,4 +1,4 @@
-package filters_provider_go
+package filters_provider
 
 import (
 	"errors"
