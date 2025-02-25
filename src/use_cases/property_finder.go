@@ -16,15 +16,19 @@ type FilterProvider interface {
 	GetFilters() (*entities.Filters, error)
 }
 
-type PropertyFinder struct {
-	reader         PropertyReader
-	filterProvider FilterProvider
-	propertiesChan chan entities.Property
-	errorChan      chan error
+type PropertyFinderInputs struct {
+	PropertiesChan chan entities.Property
+	ErrorChan      chan error
+	PropertyReader PropertyReader
+	FilterProvider FilterProvider
 }
 
-func NewPropertyFinder(propertiesChan chan entities.Property, errorChan chan error, reader PropertyReader, filterProvider FilterProvider) *PropertyFinder {
-	return &PropertyFinder{propertiesChan: propertiesChan, errorChan: errorChan, reader: reader, filterProvider: filterProvider}
+type PropertyFinder struct {
+	pfi PropertyFinderInputs
+}
+
+func NewPropertyFinder(pfi PropertyFinderInputs) *PropertyFinder {
+	return &PropertyFinder{pfi: pfi}
 }
 
 func (pf *PropertyFinder) Execute() ([]entities.Property, error) {
@@ -32,11 +36,11 @@ func (pf *PropertyFinder) Execute() ([]entities.Property, error) {
 	var filteredProperties []entities.Property
 	resultChan := make(chan entities.Property, 100)
 
-	go pf.reader.FindProperties(pf.propertiesChan, pf.errorChan)
+	go pf.pfi.PropertyReader.FindProperties(pf.pfi.PropertiesChan, pf.pfi.ErrorChan)
 
 	go pf.handleErrors()
 
-	filters, err := pf.filterProvider.GetFilters()
+	filters, err := pf.pfi.FilterProvider.GetFilters()
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +55,7 @@ func (pf *PropertyFinder) Execute() ([]entities.Property, error) {
 }
 
 func (pf *PropertyFinder) handleErrors() {
-	for err := range pf.errorChan {
+	for err := range pf.pfi.ErrorChan {
 		fmt.Printf("Error: %v\n", err)
 	}
 }
@@ -61,7 +65,7 @@ func (pf *PropertyFinder) processProperties(wg *sync.WaitGroup, filters *entitie
 		wg.Add(1)
 		go func(workerID int) {
 			defer wg.Done()
-			for property := range pf.propertiesChan {
+			for property := range pf.pfi.PropertiesChan {
 				if filters.ApplyFilters(property) {
 					resultChan <- property
 				}

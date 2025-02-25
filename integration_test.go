@@ -12,14 +12,20 @@ import (
 )
 
 func TestCompleteFlow_With_Test_Dependencies(t *testing.T) {
-	repo := readers.NewMockPropertyReader(mockedProperties())
+	reader := readers.NewMockPropertyReader(mockedProperties())
 
 	filterProvider := filters_provider.NewMockFilterProvider(mockedFilters())
 
-	jobChan := make(chan entities.Property, 100)
+	propertiesChan := make(chan entities.Property, 100)
 	errorChan := make(chan error, 10)
 
-	propertyFinder := use_cases.NewPropertyFinder(jobChan, errorChan, repo, filterProvider)
+	propertyFinder := use_cases.NewPropertyFinder(
+		use_cases.PropertyFinderInputs{
+			PropertiesChan: propertiesChan,
+			ErrorChan:      errorChan,
+			PropertyReader: reader,
+			FilterProvider: filterProvider},
+	)
 
 	filteredProperties, err := propertyFinder.Execute()
 
@@ -34,29 +40,41 @@ func TestCompleteFlow_With_Test_Dependencies(t *testing.T) {
 }
 
 func TestCompleteFlow_With_Test_Dependencies_Args_Provider_Error(t *testing.T) {
-	repo := readers.NewMockPropertyReader(mockedProperties())
+	reader := readers.NewMockPropertyReader(mockedProperties())
 
 	filterProvider := filters_provider.NewErrorMockFilterProvider()
 
-	jobChan := make(chan entities.Property, 100)
+	propertiesChan := make(chan entities.Property, 100)
 	errorChan := make(chan error, 10)
 
-	propertyFinder := use_cases.NewPropertyFinder(jobChan, errorChan, repo, filterProvider)
+	propertyFinder := use_cases.NewPropertyFinder(
+		use_cases.PropertyFinderInputs{
+			PropertiesChan: propertiesChan,
+			ErrorChan:      errorChan,
+			PropertyReader: reader,
+			FilterProvider: filterProvider},
+	)
 
 	_, err := propertyFinder.Execute()
 	assert.Error(t, err, errors.New("mocked error"))
 }
 
 func TestCompleteFlow_With_Test_Dependencies_Error_In_ErrorChan(t *testing.T) {
-	repo := readers.NewMockPropertyReader(mockedProperties())
+	reader := readers.NewMockPropertyReader(mockedProperties())
 
 	filterProvider := filters_provider.NewMockFilterProvider(mockedFilters())
 
-	jobChan := make(chan entities.Property, 100)
+	propertiesChan := make(chan entities.Property, 100)
 	errorChan := make(chan error, 10)
 
 	errorChan <- fmt.Errorf("failed to open file: %w", errors.New("custom error"))
-	propertyFinder := use_cases.NewPropertyFinder(jobChan, errorChan, repo, filterProvider)
+	propertyFinder := use_cases.NewPropertyFinder(
+		use_cases.PropertyFinderInputs{
+			PropertiesChan: propertiesChan,
+			ErrorChan:      errorChan,
+			PropertyReader: reader,
+			FilterProvider: filterProvider},
+	)
 
 	_, err := propertyFinder.Execute()
 	if err != nil {

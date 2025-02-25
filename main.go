@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-
 	propertiesChan := make(chan entities.Property, 100)
 	errorChan := make(chan error, 10)
 
@@ -17,7 +16,14 @@ func main() {
 
 	filterProvider := filters_provider.NewArgsFilterProvider()
 
-	propertyFinder := use_cases.NewPropertyFinder(propertiesChan, errorChan, propertyReader, filterProvider)
+	propertyFinder := use_cases.NewPropertyFinder(
+		use_cases.PropertyFinderInputs{
+			PropertiesChan: propertiesChan,
+			ErrorChan:      errorChan,
+			PropertyReader: propertyReader,
+			FilterProvider: filterProvider,
+		},
+	)
 
 	properties, err := propertyFinder.Execute()
 	if err != nil {
