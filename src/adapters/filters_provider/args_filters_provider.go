@@ -17,17 +17,22 @@ func NewArgsFilterProvider() *ArgsFilterProvider {
 	return &ArgsFilterProvider{}
 }
 
-func (fp *ArgsFilterProvider) GetFilters() (*entities.Filters, error) {
+func (fp *ArgsFilterProvider) GetFilters() *entities.Filters {
 	args := ParseFlags()
 
 	var filters []entities.Filter
 
+	filters = createFiltersBasedOnArgs(filters, args)
+
+	return &entities.Filters{Filters: filters}
+}
+
+func createFiltersBasedOnArgs(filters []entities.Filter, args Args) []entities.Filter {
 	filters = append(filters, parseSquareFootage(args.Flags)...)
 	filters = append(filters, parseAmenities(args.Flags["amenities"])...)
 	filters = append(filters, parseContains(args.Flags["contains"])...)
 	filters = append(filters, parseDistance(args.Flags)...)
-
-	return &entities.Filters{Filters: filters}, nil
+	return filters
 }
 
 func ParseFlags() (args Args) {
@@ -75,21 +80,21 @@ func ParseFlags() (args Args) {
 func parseSquareFootage(flags map[string]string) []entities.Filter {
 	var filters []entities.Filter
 
-	if val, ok := flags["minSqFt"]; ok || flags["maxSqFt"] != "" {
-		var minSqFt, maxSqFt *int
-		if ok {
-			v, err := parseInt(val)
-			if err == nil {
-				minSqFt = &v
-			}
-		}
-		if val, ok := flags["maxSqFt"]; ok {
-			v, err := parseInt(val)
-			if err == nil {
-				maxSqFt = &v
-			}
-		}
+	var minSqFt, maxSqFt *int
 
+	if val, ok := flags["minSqFt"]; ok {
+		if v, err := parseInt(val); err == nil {
+			minSqFt = &v
+		}
+	}
+
+	if val, ok := flags["maxSqFt"]; ok {
+		if v, err := parseInt(val); err == nil {
+			maxSqFt = &v
+		}
+	}
+
+	if minSqFt != nil || maxSqFt != nil {
 		filters = append(filters, &entities.SquareFootageFilter{
 			SquareFootageRange: &entities.SquareFootageRange{Min: minSqFt, Max: maxSqFt},
 		})
@@ -146,6 +151,7 @@ func parseDistance(flags map[string]string) []entities.Filter {
 	maxDist, errMaxDist := strconv.ParseFloat(maxDistStr, 64)
 
 	if errLat != nil || errLon != nil || errMaxDist != nil {
+
 		return filters
 	}
 

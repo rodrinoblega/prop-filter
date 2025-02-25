@@ -13,17 +13,9 @@ func main() {
 
 	filterProvider := filters_provider.NewArgsFilterProvider()
 
-	propertyFinder := use_cases.NewPropertyFinder(
-		use_cases.PropertyFinderInputs{
-			PropertyReader: propertyReader,
-			FilterProvider: filterProvider,
-		},
-	)
+	propertyFinder := use_cases.NewPropertyFinder(propertyReader, filterProvider)
 
-	properties, err := propertyFinder.Execute()
-	if err != nil {
-		log.Fatalf("Error executing property finder: %v", err)
-	}
+	properties := propertyFinder.Execute()
 
 	log.Printf("Loaded %d properties after filtering.\n", len(properties))
 

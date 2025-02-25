@@ -14,10 +14,7 @@ func Test_Args_Filters_Provider_Get_Filters(t *testing.T) {
 
 	filterProvider := NewArgsFilterProvider()
 
-	filters, err := filterProvider.GetFilters()
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
+	filters := filterProvider.GetFilters()
 
 	var expectedFilters []entities.Filter
 	expectedFilters = append(expectedFilters,

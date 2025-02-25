@@ -18,36 +18,53 @@ func NewJSONPropertyReader(filePath string) *JSONPropertyReader {
 func (r *JSONPropertyReader) FindProperties(propertiesChan chan<- entities.Property, errorChan chan error) {
 	file, err := os.Open(r.filePath)
 	if err != nil {
-		errorChan <- fmt.Errorf("failed to open file: %w", err)
-		close(errorChan)
+		sendError(errorChan, fmt.Errorf("failed to open file: %w", err))
 		return
 	}
-	defer file.Close()
 
 	decoder := json.NewDecoder(file)
 
-	//Reading first '['
-	if _, err := decoder.Token(); err != nil {
-		errorChan <- fmt.Errorf("error reading start of JSON array: %w", err)
-		close(errorChan)
+	if err := readJSONStart(decoder, errorChan); err != nil {
 		return
 	}
 
-	for decoder.More() {
-		var prop entities.Property
-		if err := decoder.Decode(&prop); err != nil {
-			errorChan <- fmt.Errorf("error decoding property: %w", err)
-			continue
-		}
+	readProperties(decoder, propertiesChan, errorChan)
 
-		propertiesChan <- prop
-	}
-
-	//Reading last ']'
-	if _, err := decoder.Token(); err != nil {
-		errorChan <- fmt.Errorf("error reading end of JSON array: %w", err)
-	}
+	readJSONEnd(decoder, errorChan)
 
 	close(propertiesChan)
 	close(errorChan)
+}
+
+func readJSONStart(decoder *json.Decoder, errorChan chan error) error {
+	if _, err := decoder.Token(); err != nil {
+		sendError(errorChan, fmt.Errorf("error reading start of JSON array: %w", err))
+		return err
+	}
+	return nil
+}
+
+func readProperties(decoder *json.Decoder, propertiesChan chan<- entities.Property, errorChan chan error) {
+	for decoder.More() {
+		var prop entities.Property
+		if err := decoder.Decode(&prop); err != nil {
+			sendError(errorChan, fmt.Errorf("error decoding property: %w", err))
+			continue
+		}
+		propertiesChan <- prop
+	}
+}
+
+func readJSONEnd(decoder *json.Decoder, errorChan chan error) {
+	if _, err := decoder.Token(); err != nil {
+		sendError(errorChan, fmt.Errorf("error reading end of JSON array: %w", err))
+	}
+}
+
+func sendError(errorChan chan error, err error) {
+	select {
+	case errorChan <- err:
+	default:
+		// avoid blocking if channel is full
+	}
 }

@@ -13,45 +13,37 @@ type PropertyReader interface {
 }
 
 type FilterProvider interface {
-	GetFilters() (*entities.Filters, error)
-}
-
-type PropertyFinderInputs struct {
-	PropertyReader PropertyReader
-	FilterProvider FilterProvider
+	GetFilters() *entities.Filters
 }
 
 type PropertyFinder struct {
-	pfi PropertyFinderInputs
+	propertyReader PropertyReader
+	filterProvider FilterProvider
 }
 
-func NewPropertyFinder(pfi PropertyFinderInputs) *PropertyFinder {
-	return &PropertyFinder{pfi: pfi}
+func NewPropertyFinder(propertyReader PropertyReader, filterProvider FilterProvider) *PropertyFinder {
+	return &PropertyFinder{propertyReader: propertyReader, filterProvider: filterProvider}
 }
 
-func (pf *PropertyFinder) Execute() ([]entities.Property, error) {
-	var wg sync.WaitGroup
+func (pf *PropertyFinder) Execute() []entities.Property {
 	var filteredProperties []entities.Property
 	resultChan := make(chan entities.Property, 100)
 	propertiesChan := make(chan entities.Property, 100)
 	errorChan := make(chan error, 10)
 
-	go pf.pfi.PropertyReader.FindProperties(propertiesChan, errorChan)
+	go pf.propertyReader.FindProperties(propertiesChan, errorChan)
 
 	go pf.handleErrors(errorChan)
 
-	filters, err := pf.pfi.FilterProvider.GetFilters()
-	if err != nil {
-		return nil, err
-	}
+	filters := pf.filterProvider.GetFilters()
 
-	pf.processProperties(&wg, filters, propertiesChan, resultChan)
+	pf.processProperties(filters, propertiesChan, resultChan)
 
-	go pf.waitAndCloseResultChan(&wg, resultChan)
+	close(resultChan)
 
 	filteredProperties = pf.collectResults(resultChan)
 
-	return filteredProperties, nil
+	return filteredProperties
 }
 
 func (pf *PropertyFinder) handleErrors(errorChan chan error) {
@@ -60,7 +52,9 @@ func (pf *PropertyFinder) handleErrors(errorChan chan error) {
 	}
 }
 
-func (pf *PropertyFinder) processProperties(wg *sync.WaitGroup, filters *entities.Filters, propertiesChan chan entities.Property, resultChan chan entities.Property) {
+func (pf *PropertyFinder) processProperties(filters *entities.Filters, propertiesChan chan entities.Property, resultChan chan entities.Property) {
+	var wg sync.WaitGroup
+
 	for i := 0; i < numWorkers; i++ {
 		wg.Add(1)
 		go func(workerID int) {
@@ -72,11 +66,8 @@ func (pf *PropertyFinder) processProperties(wg *sync.WaitGroup, filters *entitie
 			}
 		}(i)
 	}
-}
 
-func (pf *PropertyFinder) waitAndCloseResultChan(wg *sync.WaitGroup, resultChan chan entities.Property) {
 	wg.Wait()
-	close(resultChan)
 }
 
 func (pf *PropertyFinder) collectResults(resultChan chan entities.Property) []entities.Property {
