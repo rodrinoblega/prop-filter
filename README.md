@@ -41,7 +41,8 @@ This architecture adheres to the Dependency Rule, ensuring that inner layers do 
 The application follows a structured execution flow to efficiently filter properties based on user-provided criteria:
 
 1- Load Properties:
-- The JSONPropertyReader reads property data from a JSON file.
+- The JSONPropertyReader reads property data from a JSON file specified via command-line arguments.
+- If no filename is provided, the program will return an error.
 - It streams properties through a channel to avoid loading everything into memory at once.
 - Errors encountered while reading are sent to an error channel.
 
@@ -128,6 +129,8 @@ Available Filters
 - The location-based filtering (```--lat ```, ```--lon ```, and ```--maxDist ```) only works if all three parameters are provided. If any of them are missing, the location filter is ignored.
 - If ```--minSqFt ``` or ```--maxSqFt ``` is not provided, that constraint will not be applied to the results.
 
+### Examples
+
 ## Testing strategy
 
 This project follows a robust testing approach to ensure the reliability and correctness of the filtering logic.
@@ -150,10 +153,6 @@ These commands will generate a coverage report highlighting a high percentage of
 
 This project primarily relies on Go’s standard library, with the exception of:
 - Testify: Used for writing expressive and maintainable tests, providing assertions and test suite functionality.
-
-## Examples
-
-
 
 ## Questions
 
