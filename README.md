@@ -94,17 +94,25 @@ Ensure you have the following installed before running the application:
 
 1- Clone the repository:
 
-``` git clone https://github.com/rodrinoblega/prop-filter.git ```
+``` 
+git clone https://github.com/rodrinoblega/prop-filter.git 
+```
 
-``` cd prop-filter ```
+``` 
+cd prop-filter 
+```
 
 2- Build the application:
 
-``` go build -o prop-filter ```
+``` 
+go build -o prop-filter 
+```
 
 3- Run the application:
 
-``` ./prop-filter --input=<your-file>.json  ```
+``` 
+./prop-filter --input=<your-file>.json  
+```
 
 Make sure ``` <your-file>.json ``` is in the same directory or provide the full path.
 
@@ -112,11 +120,15 @@ Make sure ``` <your-file>.json ``` is in the same directory or provide the full 
 
 1- Build the Docker image:
 
-``` docker build -t prop-filter . ```
+``` 
+docker build -t prop-filter . 
+```
 
 2- Run the application with a JSON file:
 
-``` docker run --rm -v $(pwd)/<your-file>.json:/app/<your-file>.json prop-filter --input=/app/<your-file>.json ```
+``` 
+docker run --rm -v $(pwd)/<your-file>.json:/app/<your-file>.json prop-filter --input=/app/<your-file>.json 
+```
 
 Ensure ``` <your-file>.json ``` exists in the current directory.
 
@@ -124,11 +136,15 @@ Ensure ``` <your-file>.json ``` exists in the current directory.
 
 1- Pull the latest image from Docker Hub:
 
-``` docker pull rodrinoblega/prop-filter:latest ```
+``` 
+docker pull rodrinoblega/prop-filter:latest 
+```
 
 2-  Run the application without building it locally:
 
-``` docker run --rm -v $(pwd)/<your-file>.json:/app/<your-file>.json rodrinoblega/prop-filter:latest --input=/app/<your-file>.json ```
+``` 
+docker run --rm -v $(pwd)/<your-file>.json:/app/<your-file>.json rodrinoblega/prop-filter:latest --input=/app/<your-file>.json 
+```
 
 ### Additional notes
 - Ensure that ``` <your-file>.json ``` is a valid JSON file formatted correctly according to the expected schema.
@@ -139,7 +155,9 @@ Ensure ``` <your-file>.json ``` exists in the current directory.
 To filter properties, use the CLI with this optional parameters
 
 - Example
-```./prop-filter --minSqFt=1000 --maxSqFt=2000 --amenities=garage:true,pool:false --contains=modern --lat=37.7749 --lon=-122.4194 --maxDist=10 ```
+```
+ ./prop-filter --minSqFt=1000 --maxSqFt=2000 --amenities=garage:true,pool:false --contains=modern --lat=37.7749 --lon=-122.4194 --maxDist=10 
+ ```
 
 Available Filters
 
@@ -169,9 +187,13 @@ This project follows a robust testing approach to ensure the reliability and cor
 
 ### How to run tests
 
-```go test ./... -coverpkg=./... -coverprofile=coverage.out```
+```
+go test ./... -coverpkg=./... -coverprofile=coverage.out
+```
 
-```go tool cover -html=coverage.out```
+```
+go tool cover -html=coverage.out
+```
 
 These commands will generate a coverage report highlighting a high percentage of their lines covered by tests.
 
