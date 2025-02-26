@@ -1,44 +1,12 @@
 [
-  {
-    "squareFootage": 1200,
-    "lighting": "high",
-    "price": 250000,
-    "rooms": 3,
-    "bathrooms": 2,
-    "location": [40, -110],
-    "description": "Beautiful apartment.",
-    "amenities": {
-      "yard": false,
-      "garage": true,
-      "pool": false
-    }
-  },
-  {
-    "squareFootage": 2000,
-    "lighting": "medium",
-    "price": 400000,
-    "rooms": 4,
-    "bathrooms": 3,
-    "location": [34, -118],
-    "description": "Family home.",
-    "amenities": {
-      "yard": true,
-      "garage": true,
-      "pool": false
-    }
-  },
-  {
-    "squareFootage": 1800,
-    "lighting": "low",
-    "price": 320000,
-    "rooms": 3,
-    "bathrooms": 2,
-    "location": [41, -87],
-    "description": "Cozy house.",
-    "amenities": {
-      "yard": true,
-      "garage": false,
-      "pool": true
-    }
-  }
+  {"description": "Small House 1", "squareFootage": 900, "location": [20, 80], "amenities": {"yard": false,"garage": true,"pool": false}},
+  {"description": "Small House 2", "squareFootage": 1000, "location": [30, 90], "amenities": {"yard": false,"garage": true,"pool": false}},
+  {"description": "Small House 3", "squareFootage": 1100, "location": [40, 100], "amenities": {"yard": false,"garage": true,"pool": true}},
+  {"description": "Medium House 1", "squareFootage": 2100, "location": [120, -220], "amenities": {"yard": true,"garage": true,"pool": false}},
+  {"description": "Medium House 2", "squareFootage": 2200, "location": [130, -234], "amenities": {"yard": false,"garage": true,"pool": true}},
+  {"description": "Medium House 3", "squareFootage": 2499, "location": [145, -240], "amenities": {"yard": false,"garage": true,"pool": false}},
+  {"description": "Large House 1", "squareFootage": 2500, "location": [190, -250], "amenities": {"yard": true,"garage": true,"pool": false}},
+  {"description": "Large House 2", "squareFootage": 2500, "location": [195, -238], "amenities": {"yard": false,"garage": true,"pool": false}},
+  {"description": "Large House 3", "squareFootage": 2500, "location": [192, -241], "amenities": {"yard": true,"garage": true,"pool": false}},
+  {"description": "Large House 4 ", "squareFootage": 2500, "location": [188, -259], "amenities": {"yard": false,"garage": true,"pool": false}}
 ]

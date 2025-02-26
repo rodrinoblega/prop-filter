@@ -170,6 +170,152 @@ To filter properties, use the CLI with this optional parameters:
 - If ```--minSqFt ``` or ```--maxSqFt ``` is not provided, that constraint will not be applied to the results.
 
 ### Examples
+Input JSON file
+```
+[
+  {"description": "Small House 1", "squareFootage": 900, "location": [20, 80], "amenities": {"yard": false,"garage": true,"pool": false}},
+  {"description": "Small House 2", "squareFootage": 1000, "location": [30, 90], "amenities": {"yard": false,"garage": true,"pool": false}},
+  {"description": "Small House 3", "squareFootage": 1100, "location": [40, 100], "amenities": {"yard": false,"garage": true,"pool": true}},
+  {"description": "Medium House 1", "squareFootage": 2100, "location": [120, -220], "amenities": {"yard": true,"garage": true,"pool": false}},
+  {"description": "Medium House 2", "squareFootage": 2200, "location": [130, -234], "amenities": {"yard": false,"garage": true,"pool": true}},
+  {"description": "Medium House 3", "squareFootage": 2499, "location": [145, -240], "amenities": {"yard": false,"garage": true,"pool": false}},
+  {"description": "Large House 1", "squareFootage": 2500, "location": [190, -250], "amenities": {"yard": true,"garage": true,"pool": false}},
+  {"description": "Large House 2", "squareFootage": 2500, "location": [195, -238], "amenities": {"yard": false,"garage": true,"pool": false}},
+  {"description": "Large House 3", "squareFootage": 2500, "location": [192, -241], "amenities": {"yard": true,"garage": true,"pool": false}},
+  {"description": "Large House 4 ", "squareFootage": 2500, "location": [188, -259], "amenities": {"yard": false,"garage": true,"pool": false}}
+]
+```
+
+#### Case 0 : No filters applied
+
+Run Locally:
+````
+./prop-filter --input=properties.json
+````
+
+Run with Docker (Local Build):
+````
+docker run --rm -v $(pwd)/properties.json:/app/properties.json prop-filter --input=properties.json
+
+````
+Run with Docker (Pulled Image):
+````
+docker run --rm -v $(pwd)/properties.json:/app/properties.json rnoblega/prop-filter:latest --input=properties.json
+
+````
+
+Result: 
+
+![](static/test-case0.jpg)
+
+#### Case 1 : Filtering by Minimum Square Footage and Amenities (with pool and garage)
+
+Run Locally:
+````
+./prop-filter --input=properties.json --minSqFt=1000 --amenities=garage:true,pool:true
+````
+
+Run with Docker (Local Build):
+````
+docker run --rm -v $(pwd)/properties.json:/app/properties.json prop-filter --input=/app/properties.json --amenities=garage:true,pool:true
+
+````
+Run with Docker (Pulled Image):
+````
+docker run --rm -v $(pwd)/properties.json:/app/properties.json rnoblega/prop-filter:latest --input=/app/properties.json --amenities=garage:true,pool:true    
+
+````
+
+Result:
+
+![](static/test-case1.jpg)
+
+
+#### Case 2 : Filtering by Exact Square Footage
+
+Run Locally:
+````
+./prop-filter --input=properties.json --minSqFt=1000 --maxSqFt=1000
+````
+
+Run with Docker (Local Build):
+````
+docker run --rm -v $(pwd)/properties.json:/app/properties.json prop-filter --input=/app/properties.json --minSqFt=1000 --maxSqFt=1000
+
+````
+Run with Docker (Pulled Image):
+````
+docker run --rm -v $(pwd)/properties.json:/app/properties.json rnoblega/prop-filter:latest --input=/app/properties.json --minSqFt=1000 --maxSqFt=1000    
+
+````
+
+Result:
+
+![](static/test-case2.jpg)
+
+#### Case 3 : Filtering by Distance
+Note: The application uses the Haversine formula to calculate the great-circle distance between two geographic points (latitude and longitude). This allows the application to filter properties based on their distance from a specified location.
+
+Run Locally:
+````
+./prop-filter --input=properties.json --lat=100 --lon=150 --maxDist=7000
+````
+
+Run with Docker (Local Build):
+````
+docker run --rm -v $(pwd)/properties.json:/app/properties.json prop-filter --input=/app/properties.json --lat=100 --lon=150 --maxDist=7000
+
+````
+Run with Docker (Pulled Image):
+````
+docker run --rm -v $(pwd)/properties.json:/app/properties.json rnoblega/prop-filter:latest --input=/app/properties.json --lat=100 --lon=150 --maxDist=7000
+
+````
+
+#### Case 4 : Filtering by Contains
+
+Run Locally:
+````
+./prop-filter --input=properties.json --contains=Small house
+````
+
+Run with Docker (Local Build):
+````
+docker run --rm -v $(pwd)/properties.json:/app/properties.json prop-filter --input=/app/properties.json --contains=Small house
+
+````
+Run with Docker (Pulled Image):
+````
+docker run --rm -v $(pwd)/properties.json:/app/properties.json rnoblega/prop-filter:latest --input=/app/properties.json --contains=Small house
+
+````
+
+Result:
+
+![](static/test-case4.jpg)
+
+#### Case 5 : No input
+
+Run Locally:
+````
+./prop-filter 
+````
+
+Run with Docker (Local Build):
+````
+docker run --rm -v $(pwd)/properties.json:/app/properties.json prop-filter 
+
+````
+Run with Docker (Pulled Image):
+````
+docker run --rm -v $(pwd)/properties.json:/app/properties.json rnoblega/prop-filter:latest
+
+````
+
+Result:
+
+![](static/test-case5.jpg)
+
 
 ## Testing strategy
 
