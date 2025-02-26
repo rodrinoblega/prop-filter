@@ -1,80 +1,33 @@
 package filters_provider
 
 import (
-	"flag"
 	"github.com/rodrinoblega/prop-filter/src/entities"
 	"strconv"
 	"strings"
 )
 
-type ArgsFilterProvider struct{}
-
-type Args struct {
-	Flags map[string]string
+type ArgsFilterProvider struct {
+	Args map[string]string
 }
 
-func NewArgsFilterProvider() *ArgsFilterProvider {
-	return &ArgsFilterProvider{}
+func NewArgsFilterProvider(flags map[string]string) *ArgsFilterProvider {
+	return &ArgsFilterProvider{Args: flags}
 }
 
 func (fp *ArgsFilterProvider) GetFilters() *entities.Filters {
-	args := ParseFlags()
-
 	var filters []entities.Filter
 
-	filters = createFiltersBasedOnArgs(filters, args)
+	filters = createFiltersBasedOnArgs(filters, fp.Args)
 
 	return &entities.Filters{Filters: filters}
 }
 
-func createFiltersBasedOnArgs(filters []entities.Filter, args Args) []entities.Filter {
-	filters = append(filters, parseSquareFootage(args.Flags)...)
-	filters = append(filters, parseAmenities(args.Flags["amenities"])...)
-	filters = append(filters, parseContains(args.Flags["contains"])...)
-	filters = append(filters, parseDistance(args.Flags)...)
+func createFiltersBasedOnArgs(filters []entities.Filter, args map[string]string) []entities.Filter {
+	filters = append(filters, parseSquareFootage(args)...)
+	filters = append(filters, parseAmenities(args["amenities"])...)
+	filters = append(filters, parseContains(args["contains"])...)
+	filters = append(filters, parseDistance(args)...)
 	return filters
-}
-
-func ParseFlags() (args Args) {
-	flags := make(map[string]string)
-
-	minSqFt := flag.String("minSqFt", "", "Minimum square footage")
-	maxSqFt := flag.String("maxSqFt", "", "Maximum square footage")
-	amenities := flag.String("amenities", "", "Comma-separated list of amenities with true/false (e.g., garage:true,pool:false)")
-	contains := flag.String("contains", "", "Contains a specific string in the description")
-	lat := flag.String("lat", "", "Latitude for location-based filtering")
-	lon := flag.String("lon", "", "Longitude for location-based filtering")
-	maxDist := flag.String("maxDist", "", "Maximum distance in kilometers")
-
-	flag.Parse()
-
-	if *minSqFt != "" {
-		flags["minSqFt"] = *minSqFt
-	}
-	if *maxSqFt != "" {
-		flags["maxSqFt"] = *maxSqFt
-	}
-	if *amenities != "" {
-		flags["amenities"] = *amenities
-	}
-
-	if *contains != "" {
-		flags["contains"] = *contains
-	}
-
-	if *lat != "" {
-		flags["lat"] = *lat
-	}
-
-	if *lon != "" {
-		flags["lon"] = *lon
-	}
-
-	if *maxDist != "" {
-		flags["maxDist"] = *maxDist
-	}
-
-	return Args{Flags: flags}
 }
 
 func parseSquareFootage(flags map[string]string) []entities.Filter {

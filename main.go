@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/rodrinoblega/prop-filter/src/adapters/cli"
 	"github.com/rodrinoblega/prop-filter/src/adapters/filters_provider"
 	"github.com/rodrinoblega/prop-filter/src/adapters/readers"
 	"github.com/rodrinoblega/prop-filter/src/entities"
@@ -9,9 +10,14 @@ import (
 )
 
 func main() {
-	propertyReader := readers.NewJSONPropertyReader("./properties.json")
+	args := cli.ParseFlags()
 
-	filterProvider := filters_provider.NewArgsFilterProvider()
+	propertyReader, err := readers.NewJSONPropertyReader(args)
+	if err != nil {
+		log.Fatalf("error with input: %v", err.Error())
+	}
+
+	filterProvider := filters_provider.NewArgsFilterProvider(args)
 
 	propertyFinder := use_cases.NewPropertyFinder(propertyReader, filterProvider)
 

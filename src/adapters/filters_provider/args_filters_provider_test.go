@@ -1,29 +1,30 @@
 package filters_provider
 
 import (
-	"flag"
 	"github.com/rodrinoblega/prop-filter/src/entities"
-	"github.com/stretchr/testify/assert"
-	"os"
 	"testing"
 )
 
-func Test_Args_Filters_Provider_Get_Filters(t *testing.T) {
-	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.ExitOnError)
-	os.Args = []string{"cmd", "-minSqFt", "1100", "-maxSqFt", "1200", "-amenities", "garage:true", "-contains", "Family", "-lat", "34", "-lon", "-118", "-maxDist", "100"}
+func TestParseContains_ValidCase(t *testing.T) {
+	flags := map[string]string{
+		"contains": "match",
+	}
 
-	filterProvider := NewArgsFilterProvider()
+	filterProvider := NewArgsFilterProvider(flags)
+	filters := filterProvider.GetFilters().Filters
 
-	filters := filterProvider.GetFilters()
+	if len(filters) != 1 {
+		t.Errorf("Expected 1 filter, got %d", len(filters))
+	}
 
-	var expectedFilters []entities.Filter
-	expectedFilters = append(expectedFilters,
-		&entities.SquareFootageFilter{SquareFootageRange: &entities.SquareFootageRange{Min: toPtr(1100), Max: toPtr(1200)}},
-		&entities.InclusionFilter{Field: "garage", Value: true},
-		&entities.MatchingFilter{Word: "Family"},
-		&entities.DistanceFilter{Lat: 34, Lon: -118, MaxDist: 100})
+	matchingFilter, ok := filters[0].(*entities.MatchingFilter)
+	if !ok {
+		t.Fatalf("Expected MatchingFilter, got %T", filters[0])
+	}
 
-	assert.Equal(t, len(expectedFilters), len(filters.Filters))
+	if matchingFilter.Word != "match" {
+		t.Errorf("Expected Word to be match, got %s", matchingFilter.Word)
+	}
 }
 
 func TestParseSquareFootage_InvalidMin(t *testing.T) {
@@ -32,7 +33,8 @@ func TestParseSquareFootage_InvalidMin(t *testing.T) {
 		"maxSqFt": "1234",
 	}
 
-	filters := parseSquareFootage(flags)
+	filterProvider := NewArgsFilterProvider(flags)
+	filters := filterProvider.GetFilters().Filters
 
 	if len(filters) != 1 {
 		t.Errorf("Expected 1 filter, got %d", len(filters))
@@ -54,7 +56,8 @@ func TestParseSquareFootage_InvalidMax(t *testing.T) {
 		"maxSqFt": "cde",
 	}
 
-	filters := parseSquareFootage(flags)
+	filterProvider := NewArgsFilterProvider(flags)
+	filters := filterProvider.GetFilters().Filters
 
 	if len(filters) != 1 {
 		t.Errorf("Expected 1 filter, got %d", len(filters))
@@ -87,6 +90,30 @@ func TestParseAmenities_InvalidFormat(t *testing.T) {
 
 	if f, ok := filters[0].(*entities.InclusionFilter); !ok || f.Field != "garage" || f.Value != true {
 		t.Errorf("Expected InclusionFilter for garage:true, got %+v", f)
+	}
+}
+
+func TestParseDistance_ValidValue(t *testing.T) {
+	flags := map[string]string{
+		"lat":     "34",
+		"lon":     "34",
+		"maxDist": "34",
+	}
+
+	filterProvider := NewArgsFilterProvider(flags)
+	filters := filterProvider.GetFilters().Filters
+
+	if len(filters) != 1 {
+		t.Errorf("Expected 1 filter, got %d", len(filters))
+	}
+
+	distanceFilter, ok := filters[0].(*entities.DistanceFilter)
+	if !ok {
+		t.Fatalf("Expected MatchingFilter, got %T", filters[0])
+	}
+
+	if distanceFilter.Lat != 34 {
+		t.Errorf("Expected Lat to be 34, got %f", distanceFilter.Lat)
 	}
 }
 
@@ -129,8 +156,4 @@ func TestParseDistance_InvalidValues(t *testing.T) {
 			}
 		})
 	}
-}
-
-func toPtr(number int) *int {
-	return &number
 }

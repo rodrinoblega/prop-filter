@@ -22,8 +22,9 @@ func Test_NewJSONPropertyRepository_Find_Properties(t *testing.T) {
 
 	filename := createTempFile(t, jsonData)
 	defer os.Remove(filename)
+	flags := map[string]string{"input": filename}
 
-	reader := NewJSONPropertyReader(filename)
+	reader, _ := NewJSONPropertyReader(flags)
 	resultChan := make(chan entities.Property, 100)
 	errorChan := make(chan error, 10)
 
@@ -38,39 +39,32 @@ func Test_NewJSONPropertyRepository_Find_Properties(t *testing.T) {
 	assert.Equal(t, expectedProperties, properties)
 }
 
-func TestFindProperties_FileOpenError(t *testing.T) {
-	jobChan := make(chan entities.Property)
-	errorChan := make(chan error)
+func TestNewJSONPropertyReader_FileOpenError(t *testing.T) {
+	_, err := NewJSONPropertyReader(map[string]string{"input": "invalid"})
 
-	reader := JSONPropertyReader{filePath: "non_existent_file.json"}
-
-	go reader.FindProperties(jobChan, errorChan)
-
-	err := <-errorChan
-	if err == nil || !strings.Contains(err.Error(), "failed to open file") {
-		t.Errorf("Expected file open error, got: %v", err)
-	}
+	assert.Error(t, err)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to open file: open invalid: no such file or directory")
 }
 
 func TestFindProperties_JSONDecodeError(t *testing.T) {
-	tmpFile, err := os.CreateTemp("", "invalid.json")
-	if err != nil {
-		t.Fatalf("Failed to create temp file: %v", err)
-	}
-	defer os.Remove(tmpFile.Name())
+	invalidJSON := `[ {  
+		"squareFootage"
+	}]`
 
-	tmpFile.WriteString("{invalid_json}")
-	tmpFile.Close()
+	filePath := createTempFileWithContent(t, invalidJSON)
+	defer os.Remove(filePath)
 
-	jobChan := make(chan entities.Property)
-	errorChan := make(chan error)
+	flags := map[string]string{"input": filePath}
 
-	reader := JSONPropertyReader{filePath: tmpFile.Name()}
+	propertiesChan := make(chan entities.Property, 10)
+	errorChan := make(chan error, 10)
 
-	go reader.FindProperties(jobChan, errorChan)
+	reader, _ := NewJSONPropertyReader(flags)
+	go reader.FindProperties(propertiesChan, errorChan)
 
-	err = <-errorChan
-	if err == nil || !strings.Contains(err.Error(), "error decoding property") {
+	err := <-errorChan
+	if err == nil || !strings.Contains(err.Error(), "error decoding property: invalid character '}' after object key") {
 		t.Errorf("Expected JSON decode error, got: %v", err)
 	}
 }
@@ -85,10 +79,12 @@ func TestFindProperties_ErrorMissingOpeningBracket(t *testing.T) {
 	filePath := createTempFileWithContent(t, invalidJSON)
 	defer os.Remove(filePath)
 
+	flags := map[string]string{"input": filePath}
+
 	propertiesChan := make(chan entities.Property, 10)
 	errorChan := make(chan error, 10)
 
-	reader := NewJSONPropertyReader(filePath)
+	reader, _ := NewJSONPropertyReader(flags)
 	go reader.FindProperties(propertiesChan, errorChan)
 
 	err := <-errorChan
@@ -106,11 +102,12 @@ func TestFindProperties_ErrorMissingClosingBracket(t *testing.T) {
 
 	filePath := createTempFileWithContent(t, invalidJSON)
 	defer os.Remove(filePath)
+	flags := map[string]string{"input": filePath}
 
 	propertiesChan := make(chan entities.Property, 10)
 	errorChan := make(chan error, 10)
 
-	reader := NewJSONPropertyReader(filePath)
+	reader, _ := NewJSONPropertyReader(flags)
 	go reader.FindProperties(propertiesChan, errorChan)
 
 	var lastErr error
@@ -120,6 +117,15 @@ func TestFindProperties_ErrorMissingClosingBracket(t *testing.T) {
 
 	assert.Error(t, lastErr)
 	assert.Contains(t, lastErr.Error(), "error reading end of JSON array")
+}
+
+func TestFindProperties_No_Input(t *testing.T) {
+	flags := map[string]string{}
+
+	_, err := NewJSONPropertyReader(flags)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "missing required flag: --input (path to JSON file)")
 }
 
 func createTempFileWithContent(t *testing.T, content string) string {
