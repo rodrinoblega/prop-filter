@@ -31,6 +31,11 @@ Note on Frameworks Layer
 
 ![](static/prop-filter-diagram.jpg)
 
+### Additional Notes
+
+This architecture adheres to the Dependency Rule, ensuring that inner layers do not depend on outer layers. Any dependency on external layers is managed through interfaces, making the system scalable and easily interchangeable. This design allows modifications to be made in outer layers without affecting core business logic, ensuring maintainability and flexibility in future enhancements.
+
+
 ## Application Flow
 
 The application follows a structured execution flow to efficiently filter properties based on user-provided criteria:
@@ -55,6 +60,24 @@ The application follows a structured execution flow to efficiently filter proper
 5- Collect Results and Display Output:
 - The results channel is processed, collecting the final list of filtered properties.
 - The application prints the filtered properties and logs the total count.
+
+### Parallel Processing with Workers
+To efficiently handle large volumes of data, the application utilizes multiple workers running in parallel. The process works as follows:
+
+- Property Loading:
+Properties are read from the JSON file and sent through a channel to avoid loading everything into memory at once.
+
+- Task Distribution:
+A pool of goroutines (workers) retrieves properties from the channel and applies the filtering criteria in parallel.
+Once a worker completes processing a property, it immediately retrieves the next available property to maximize efficiency.
+
+- Criteria Evaluation:
+Each worker checks whether a property meets the specified filters set by the user.
+
+- Result Collection:
+Properties that pass the filtering criteria are sent to another channel, where they are aggregated and printed as output.
+
+This worker-based approach ensures better scalability and efficiency, as it allows filtering operations to be performed concurrently, reducing execution time for large property datasets.
 
 ## How to run the application
 
@@ -128,7 +151,9 @@ These commands will generate a coverage report highlighting a high percentage of
 This project primarily relies on Go’s standard library, with the exception of:
 - Testify: Used for writing expressive and maintainable tests, providing assertions and test suite functionality.
 
-## Assumptions
+## Examples
+
+
 
 ## Questions
 
