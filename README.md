@@ -106,7 +106,7 @@ Ensure you have the following installed before running the application:
 
 ``` ./prop-filter --input=<your-file>.json  ```
 
-Make sure <your-file>.json is in the same directory or provide the full path.
+Make sure ``` <your-file>.json ``` is in the same directory or provide the full path.
 
 ### Option 2: Run with Docker (Build Locally)
 
@@ -118,7 +118,7 @@ Make sure <your-file>.json is in the same directory or provide the full path.
 
 ``` docker run --rm -v $(pwd)/<your-file>.json:/app/<your-file>.json prop-filter --input=/app/<your-file>.json ```
 
-Ensure <your-file>.json exists in the current directory.
+Ensure ``` <your-file>.json ``` exists in the current directory.
 
 ### Option 3: Run with Docker (Pull from Docker Hub)
 
@@ -131,7 +131,7 @@ Ensure <your-file>.json exists in the current directory.
 ``` docker run --rm -v $(pwd)/<your-file>.json:/app/<your-file>.json rodrinoblega/prop-filter:latest --input=/app/<your-file>.json ```
 
 ### Additional notes
-- Ensure that <your-file>.json is a valid JSON file formatted correctly according to the expected schema.
+- Ensure that ``` <your-file>.json ``` is a valid JSON file formatted correctly according to the expected schema.
 - When using Docker, always mount the file with ``` -v $(pwd)/<your-file>.json:/app/<your-file>.json ``` to ensure the container can access it.
 
 ### Usage

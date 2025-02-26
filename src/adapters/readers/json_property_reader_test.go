@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_NewJSONPropertyRepository_Find_Properties(t *testing.T) {
+func TestNewJSONPropertyRepository_FindProperties(t *testing.T) {
 	jsonData := `[  
 		{"squareFootage": 150},  
 		{"squareFootage": 200}  
@@ -119,7 +119,7 @@ func TestFindProperties_ErrorMissingClosingBracket(t *testing.T) {
 	assert.Contains(t, lastErr.Error(), "error reading end of JSON array")
 }
 
-func TestFindProperties_No_Input(t *testing.T) {
+func TestFindProperties_NoInput(t *testing.T) {
 	flags := map[string]string{}
 
 	_, err := NewJSONPropertyReader(flags)
