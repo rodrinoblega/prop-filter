@@ -272,6 +272,8 @@ docker run --rm -v $(pwd)/properties.json:/app/properties.json rnoblega/prop-fil
 
 ````
 
+![](static/test-case3.jpg)
+
 #### Case 4 : Filtering by a specific string in description attribute
 
 Run Locally:
