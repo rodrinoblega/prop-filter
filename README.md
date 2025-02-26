@@ -208,7 +208,7 @@ Result:
 
 ![](static/test-case0.jpg)
 
-#### Case 1 : Filtering by Minimum Square Footage and Amenities (with pool and garage)
+#### Case 1 : Filtering by minimum square footage and specific amenities (with pool and garage)
 
 Run Locally:
 ````
@@ -253,7 +253,7 @@ Result:
 
 ![](static/test-case2.jpg)
 
-#### Case 3 : Filtering by Distance
+#### Case 3 : Filtering by distance
 Note: The application uses the Haversine formula to calculate the great-circle distance between two geographic points (latitude and longitude). This allows the application to filter properties based on their distance from a specified location.
 
 Run Locally:
@@ -272,7 +272,7 @@ docker run --rm -v $(pwd)/properties.json:/app/properties.json rnoblega/prop-fil
 
 ````
 
-#### Case 4 : Filtering by Contains
+#### Case 4 : Filtering by a specific string in description attribute
 
 Run Locally:
 ````
