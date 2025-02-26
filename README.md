@@ -152,14 +152,7 @@ docker run --rm -v $(pwd)/<your-file>.json:/app/<your-file>.json rodrinoblega/pr
 
 ### Usage
 
-To filter properties, use the CLI with this optional parameters
-
-- Example
-```
- ./prop-filter --minSqFt=1000 --maxSqFt=2000 --amenities=garage:true,pool:false --contains=modern --lat=37.7749 --lon=-122.4194 --maxDist=10 
- ```
-
-Available Filters
+To filter properties, use the CLI with this optional parameters:
 
 | Parameter          | Description                                                | Required Together                                      | Example                                   |
 |--------------------|------------------------------------------------------------|--------------------------------------------------------|-------------------------------------------|
@@ -197,7 +190,7 @@ go tool cover -html=coverage.out
 
 These commands will generate a coverage report highlighting a high percentage of their lines covered by tests.
 
-<img height="600" src="static/test-coverage.jpg" width="750"/>
+![](static/test-coverage.jpg)
 
 
 ## External Libraries Used
