@@ -231,7 +231,7 @@ Result:
 ![](static/test-case1.jpg)
 
 
-#### Case 2 : Filtering by Exact Square Footage
+#### Case 2 : Filtering by exact square footage
 
 Run Locally:
 ````
