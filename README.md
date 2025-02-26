@@ -88,22 +88,51 @@ Ensure you have the following installed before running the application:
 - Go (version 1.23 or later)
 - A terminal with access to run CLI commands
 - Git (for cloning the repository)
+- Docker (if running with a container)
 
-### Installation
+### Option 1: Run Locally
 
 1- Clone the repository:
 
-```git clone https://github.com/rodrinoblega/prop-filter.git ```
+``` git clone https://github.com/rodrinoblega/prop-filter.git ```
 
-```cd prop-filter ```
+``` cd prop-filter ```
 
 2- Build the application:
 
-```go build -o prop-filter ```
+``` go build -o prop-filter ```
 
 3- Run the application:
 
-``` ./prop-filter --minSqFt=1000  ```
+``` ./prop-filter --input=<your-file>.json  ```
+
+Make sure <your-file>.json is in the same directory or provide the full path.
+
+### Option 2: Run with Docker (Build Locally)
+
+1- Build the Docker image:
+
+``` docker build -t prop-filter . ```
+
+2- Run the application with a JSON file:
+
+``` docker run --rm -v $(pwd)/<your-file>.json:/app/<your-file>.json prop-filter --input=/app/<your-file>.json ```
+
+Ensure <your-file>.json exists in the current directory.
+
+### Option 3: Run with Docker (Pull from Docker Hub)
+
+1- Pull the latest image from Docker Hub:
+
+``` docker pull rodrinoblega/prop-filter:latest ```
+
+2-  Run the application without building it locally:
+
+``` docker run --rm -v $(pwd)/<your-file>.json:/app/<your-file>.json rodrinoblega/prop-filter:latest --input=/app/<your-file>.json ```
+
+### Additional notes
+- Ensure that <your-file>.json is a valid JSON file formatted correctly according to the expected schema.
+- When using Docker, always mount the file with ``` -v $(pwd)/<your-file>.json:/app/<your-file>.json ``` to ensure the container can access it.
 
 ### Usage
 

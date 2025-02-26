@@ -29,9 +29,7 @@ func NewJSONPropertyReader(flags map[string]string) (*JSONPropertyReader, error)
 func (r *JSONPropertyReader) FindProperties(propertiesChan chan<- entities.Property, errorChan chan error) {
 	decoder := json.NewDecoder(r.file)
 
-	if err := readJSONStart(decoder, errorChan); err != nil {
-		return
-	}
+	readJSONStart(decoder, errorChan)
 
 	readProperties(decoder, propertiesChan, errorChan)
 
@@ -41,12 +39,10 @@ func (r *JSONPropertyReader) FindProperties(propertiesChan chan<- entities.Prope
 	close(errorChan)
 }
 
-func readJSONStart(decoder *json.Decoder, errorChan chan error) error {
+func readJSONStart(decoder *json.Decoder, errorChan chan error) {
 	if _, err := decoder.Token(); err != nil {
 		sendError(errorChan, fmt.Errorf("error reading start of JSON array: %w", err))
-		return err
 	}
-	return nil
 }
 
 func readProperties(decoder *json.Decoder, propertiesChan chan<- entities.Property, errorChan chan error) {

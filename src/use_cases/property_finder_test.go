@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHandleErrors_PrintsErrors(t *testing.T) {
+func TestHandleErrors_PrintErrors(t *testing.T) {
 	errorChan := make(chan error, 2)
 	errorChan <- fmt.Errorf("custom error")
 	close(errorChan)
