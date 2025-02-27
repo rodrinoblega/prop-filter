@@ -294,6 +294,28 @@ Result:
 
 ![](static/test-case5.jpg)
 
+#### Case 6 : Invalid argument
+
+Run Locally:
+````
+./prop-filter --input=properties.json --flag=invalid
+````
+
+Run with Docker (Local Build):
+````
+docker run --rm -v $(pwd)/properties.json:/app/properties.json prop-filter --input=properties.json --flag=invalid
+
+````
+Run with Docker (Pulled Image):
+````
+docker run --rm -v $(pwd)/properties.json:/app/properties.json rnoblega/prop-filter:latest --input=properties.json --flag=invalid
+
+````
+
+Result:
+
+![](static/test-case6.jpg)
+
 
 ## Testing strategy
 
