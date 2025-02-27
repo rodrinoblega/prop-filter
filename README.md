@@ -38,47 +38,23 @@ This architecture adheres to the Dependency Rule, ensuring that inner layers do 
 
 ## Application Flow
 
-The application follows a structured execution flow to efficiently filter properties based on user-provided criteria:
+The application follows a structured execution flow to efficiently filter properties:
 
-1- Load Properties:
-- The JSONPropertyReader reads property data from a JSON file specified via command-line arguments.
-- If no filename is provided, the program will return an error.
-- It streams properties through a channel to avoid loading everything into memory at once.
-- Errors encountered while reading are sent to an error channel.
-
-2- Parse Filters:
-- The ArgsFilterProvider parses command-line arguments and constructs the necessary filters.
-- Filters include criteria like square footage, amenities, keywords, and location-based filtering.
-
-3- Process Properties:
-- The PropertyFinder orchestrates the filtering process.
-- It spawns multiple worker goroutines to apply filters in parallel for better performance.
-- Each property is checked against the filter criteria, and matching properties are sent to a results channel.
-
-4- Handle Errors:
-- A separate goroutine listens for errors and logs them without interrupting execution.
-
-5- Collect Results and Display Output:
-- The results channel is processed, collecting the final list of filtered properties.
-- The application prints the filtered properties and logs the total count.
+- Load Properties: Reads property data from a JSON file via CLI arguments, streaming through a channel to optimize memory usage.
+- Parse Filters: Extracts filter criteria (square footage, amenities, location, etc.) from CLI arguments.
+- Process Properties: Uses parallel processing to apply filters efficiently across multiple goroutines.
+- Handle Errors: Errors are logged asynchronously without interrupting execution.
+- Display Results: The filtered properties are collected and displayed, along with the total count.
 
 ### Parallel Processing with Workers
-To efficiently handle large volumes of data, the application utilizes multiple workers running in parallel. The process works as follows:
+  
+To efficiently process large datasets, the application utilizes goroutine-based workers:
 
-- Property Loading:
-Properties are read from the JSON file and sent through a channel to avoid loading everything into memory at once.
+- Streaming Input: Properties are read in chunks via channels, reducing memory overhead.
+- Concurrent Filtering: Multiple workers apply filters in parallel, improving performance.
+- Optimized Processing: Workers fetch and evaluate properties dynamically, ensuring fast execution.
 
-- Task Distribution:
-A pool of goroutines (workers) retrieves properties from the channel and applies the filtering criteria in parallel.
-Once a worker completes processing a property, it immediately retrieves the next available property to maximize efficiency.
-
-- Criteria Evaluation:
-Each worker checks whether a property meets the specified filters set by the user.
-
-- Result Collection:
-Properties that pass the filtering criteria are sent to another channel, where they are aggregated and printed as output.
-
-This worker-based approach ensures better scalability and efficiency, as it allows filtering operations to be performed concurrently, reducing execution time for large property datasets.
+This architecture ensures scalability and efficient processing.
 
 ## How to run the application
 
