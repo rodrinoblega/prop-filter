@@ -113,13 +113,13 @@ Ensure ``` <your-file>.json ``` exists in the current directory.
 1- Pull the latest image from Docker Hub:
 
 ``` 
-docker pull rodrinoblega/prop-filter:latest 
+docker pull rnoblega/prop-filter:latest 
 ```
 
 2-  Run the application without building it locally:
 
 ``` 
-docker run --rm -v $(pwd)/<your-file>.json:/app/<your-file>.json rodrinoblega/prop-filter:latest --input=/app/<your-file>.json 
+docker run --rm -v $(pwd)/<your-file>.json:/app/<your-file>.json rnoblega/prop-filter:latest --input=/app/<your-file>.json 
 ```
 
 ### Additional notes
