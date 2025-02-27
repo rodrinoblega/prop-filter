@@ -133,7 +133,7 @@ To filter properties, use the CLI with this optional parameters:
 | Parameter          | Description                                                | Required Together                                      | Example                                   |
 |--------------------|------------------------------------------------------------|--------------------------------------------------------|-------------------------------------------|
 | ```--minSqFt ```   | Minimum square footage                                     | No                                                     | ```--minSqFt=500 ```                      |
-| ```--maxSqFt ```   | Maximum square footage                                     | No                                                     | ```--minSqFt=500 ```                      |
+| ```--maxSqFt ```   | Maximum square footage                                     | No                                                     | ```--maxSqFt=500 ```                      |
 | ```--amenities ``` | Comma-separated list of amenities with true/false values   | No                                                     | ```--amenities=garage:true,pool:false ``` |
 | ```--contains ```  | Filters descriptions that contain the specified word       | No                                                     | ```--contains=ocean view ```              |
 | ```--lat ```       | Latitude for location-based filtering                      | Yes (--lat, --lon, and --maxDist must all be provided) | ```--lat=37 ```                           |
