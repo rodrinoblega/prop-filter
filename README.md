@@ -33,7 +33,7 @@ Note on Frameworks Layer
 
 ### Additional Notes
 
-This architecture adheres to the Dependency Rule, ensuring that inner layers do not depend on outer layers. Any dependency on external layers is managed through interfaces, making the system scalable and easily interchangeable. This design allows modifications to be made in outer layers without affecting core business logic, ensuring maintainability and flexibility in future enhancements.
+This architecture follows the Dependency Rule, ensuring that inner layers remain independent of outer layers. Any dependency on external layers is managed through interfaces, making the system scalable and easily interchangeable. This design allows modifications to be made in outer layers without affecting core business logic, ensuring maintainability and flexibility in future enhancements.
 
 
 ## Application Flow
@@ -90,7 +90,7 @@ go build -o prop-filter
 ./prop-filter --input=<your-file>.json  
 ```
 
-Make sure ``` <your-file>.json ``` is in the same directory or provide the full path.
+Ensure that ``` <your-file>.json ``` is in the same directory as the executable or provide the full path.
 
 ### Option 2: Run with Docker (Build Locally)
 
@@ -106,7 +106,7 @@ docker build -t prop-filter .
 docker run --rm -v $(pwd)/<your-file>.json:/app/<your-file>.json prop-filter --input=/app/<your-file>.json 
 ```
 
-Ensure ``` <your-file>.json ``` exists in the current directory.
+Make sure that <your-file>.json exists in the current directory before running the command.
 
 ### Option 3: Run with Docker (Pull from Docker Hub)
 
@@ -128,7 +128,7 @@ docker run --rm -v $(pwd)/<your-file>.json:/app/<your-file>.json rnoblega/prop-f
 
 ### Usage
 
-To filter properties, use the CLI with this optional parameters:
+To filter properties, use the CLI with these optional parameters:
 
 | Parameter          | Description                                                | Required Together                                      | Example                                   |
 |--------------------|------------------------------------------------------------|--------------------------------------------------------|-------------------------------------------|
@@ -250,7 +250,7 @@ docker run --rm -v $(pwd)/properties.json:/app/properties.json rnoblega/prop-fil
 
 ![](static/test-case3.jpg)
 
-#### Case 4 : Filtering by a specific string in description attribute
+#### Case 4 : Filtering by a specific string in the description attribute
 
 Run Locally:
 ````
