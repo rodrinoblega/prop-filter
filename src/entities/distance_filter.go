@@ -1,7 +1,6 @@
 package entities
 
 import (
-	"log"
 	"math"
 )
 
@@ -22,9 +21,6 @@ func (df *DistanceFilter) Matches(property Property) bool {
 	a := math.Pow(math.Sin(diffLat/2), 2) + math.Cos(lat1)*math.Cos(lat2)*math.Pow(math.Sin(diffLon/2), 2)
 	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
 	currentDistance := R * c
-
-	log.Printf("The distance is %v", currentDistance)
-	log.Printf("The max dist is %v", df.MaxDist)
 
 	if df.MaxDist < currentDistance {
 		return false
