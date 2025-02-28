@@ -56,6 +56,10 @@ To efficiently process large datasets, the application utilizes goroutine-based 
 
 This architecture ensures scalability and efficient processing.
 
+### Flow sequence diagram
+
+![](static/flow-sequence-diagram.jpg)
+
 ## How to run the application
 
 ### Prerequisites
